@@ -105,7 +105,6 @@ string homens_sao_mais_estressados_que_mulheres(std::vector<int> vetor){
 int main(){ 
     std::vector<int> meuVetor {90, -90, 80, -80, -98, 52};
 
-    // SAÍDAS 
     cout << "=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=" << "\n";
     cout << "Qual a média de stress da fila?: " <<  calcular_stress_medio(meuVetor) << "\n";
     cout << "Na fila existem mais homens ou mulheres?: " << mais_homens_ou_mulheres(meuVetor) << "\n";
