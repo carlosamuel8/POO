@@ -42,6 +42,7 @@ int main(){
     std::vector<int> vetor{90, -90, 80, -80, -8, 10};
 
     std::cout << "=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=" <<"\n";
+    
     auto copiavet = clone(vetor);
     std::cout << "Clone: ";
     for (size_t i = 0; i < copiavet.size(); ++i) {
