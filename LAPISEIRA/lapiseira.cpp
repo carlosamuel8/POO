@@ -1,60 +1,4 @@
-#include <iostream>
-#include <clocale> 
-class lapiseira {     
 
-    public:
-
-        const float calibre = 0.7;   
-
-        int tamanho = 4;
-
-        std:: string dureza = "3B";
-
-        auto personalizar(std:: string durezza, int tamanhoo){
-            
-            dureza = durezza;
-
-            tamanho = tamanhoo;
-        }  
-
-};
-
-void organização(std:: string& dureza, int& tamanho){
-
-    std:: cout << "Por padrão, o calibre é 0.7\n\n";
-
-    std:: cout << "Digite a dureza\n\n";
-
-    std:: cin >> dureza; 
-
-    std:: cout << "Digite o tamanho\n\n";
-
-    std:: cin >> tamanho; 
-
-}
-int main(){
-
-    setlocale(LC_ALL, "portuguese");
-
-    lapiseira nova;    
-    
-    std:: string dureza;
-
-    int tamanho = 0;
-
-    organização(dureza, tamanho);
-
-    nova.personalizar(dureza, tamanho);
-
-    std:: cout << "essas são as propriedades da sua lapiseira: \n\n";
-
-    std:: cout << "Dureza: " << nova.dureza << "\n\nTamanho: " <<  nova.tamanho << " mm";
-
-    return 0;
-
-}
-
-/*
 #include<iostream>
 #include<algorithm>
 
@@ -81,8 +25,6 @@ struct Grafite{
         }
 
     }
-
-
 };
 
 struct Lapiseira{
@@ -163,4 +105,3 @@ int main(){
 
     return 0;
 }
-*/
