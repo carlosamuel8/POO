@@ -1,105 +1,88 @@
 #include <iostream>
-#include <vector>
-#include <string>
 #include <sstream>
+#include <vector>
 
-class Fone{
-    std::string id;
-    std::string number;
 
+class Cliente{
+    std::string fone;
+    std::string id_nome;
 
 public:
-    Fone(std::string id="-", std::string number="-"){
-        this->id = id;
-        this->number = number;
+    Cliente (std::string id_nome = "", std::string fone = "") : id_nome {id_nome}, fone {fone} {
     }
 
-    std::string getId(){
-        return this->id;
-    };
+    std::string getFone(){
+        return fone;
+    }
 
-    std::string getNumber(){
-        return this->number;
-    };
+    std::string getId_Nome(){
+        return id_nome;
+    }
 
-    void setId(std::string id){
-        this->id = id;
-    };
+    std::string setFone(){
+        this->fone=fone;
+    } 
 
-    void setNumber(std::string number){
-        this->number = number;
-    };
+    std::string setId_nome(){
+        this->id_nome=id_nome;
+    } 
+
+
 };
 
-class Contact{
-    std::string prefix = "-";
-    std::vector<Fone> fones;
-    std::string name;
+
+class Sala {
+    std::vector<Cliente> cadeiras;
 
 public:
-    Contact(std::string name = ""){
-        this->name = name;
+    Sala (int capacidade = 0) {
+        this->iniciar(capacidade);
     }
 
-    void addFone(Fone fone){
-        fones.push_back(fone);
-    }
-   
-    void rmFone(int index){
-        fones.erase(fones.begin() + index);
-    }
-
-    std::string toString(){
-        std::stringstream str;
-        str << prefix << " " << this->name << "\n";
-        for(int i = 0; i < fones.size(); i++){
-            str << "[" << i << " : " << fones[i].getId() << " : " << fones[i].getNumber() << "]\n";
+    void iniciar (int capacidade) {
+        std::vector<Cliente> auxiliar;
+        for (int i{0}; i < capacidade; i++) {
+            Cliente cliente;
+            auxiliar.push_back(cliente);
         }
-        return str.str();
+        this->cadeiras = auxiliar;
     }
 
-    std::string getName(){
-        return this->name;
+    void cancelar (std::string id) {
+        bool teste = true;
+        for (auto& i : this->cadeiras) {
+            if (i.getId_Nome() == id) {
+                i.getId_Nome();
+                i.setFone();
+                teste = false;
+                break;
+            }
+        }
+        if (teste == true) {
+            std::cout << "Operacao invalida, o cliente nao esta no cinema\n";
+        }
+
     }
 
-    void setName(std::string name){
-        this->name = name;
+    bool reservar(std::string id, std::string fone, int ind) {
+        if (ind >= this->cadeiras.size()) {
+            std::cout << "Cadeira invalida \n";
+            return false;
+        }
+
+        for (auto& i : this->cadeiras) {
+            if (i.getId_Nome() == id) {
+                std::cout << "Cliente ja esta no cinema \n";
+                return false;
+            }
+        }
     }
 };
+
 
 int main(){
-    Contact contato;
-    Fone fone;
 
-    while(true){
-        std::string str;
-        std::cin >> str;
-        if(str == "init"){
-            std::string name;
-            std::cin >> name;
-            contato = Contact(name);
 
-        }else if(str == "add"){
-            std::string id;
-            std::string number;
-            std::cin >> id >> number;
-            contato.addFone(fone);
-        }
 
-        else if(str == "rm"){
-            int indice;
-            std::cin >> indice;
-            contato.rmFone(indice);
-        }
-        
-        else if(str == "show"){
-            std::cout << contato.toString() << std::endl;
-        }
-        else if(str == "end"){
-            break;
-        }
-        else{
-            std::cout << "-Comando invalido-" << std::endl;
-        }
-    }
+    return 0;
 }
