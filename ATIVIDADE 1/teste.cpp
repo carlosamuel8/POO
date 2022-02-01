@@ -6,6 +6,6 @@ auto soma(auto a, auto b){
 }
 int main(){
     cout << soma(5, 6) << endl;
-    cout << "testANDO" << endl;
+    cout << "testando" << endl;
     return 0;
 }
