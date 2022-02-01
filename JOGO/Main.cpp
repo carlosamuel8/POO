@@ -82,9 +82,9 @@ struct Board {
 
 int main()
 {
-  sf::Texture jogador_tex{loadTexture("C:\\Users\\carlo\\Desktop\\jogo\\src\\jogador.png")};
-  sf::Texture gol_tex {loadTexture("C:\\Users\\carlo\\Desktop\\jogo\\src\\gol.png")};
-  sf::Texture grama_tex{loadTexture("C:\\Users\\carlo\\Desktop\\jogo\\src\\grama.jpg")};
+  sf::Texture jogador_tex{loadTexture("jogador.png")};
+  sf::Texture gol_tex {loadTexture("gol.png")};
+  sf::Texture grama_tex{loadTexture("grama.jpg")};
 
   const int STEP{100};
 

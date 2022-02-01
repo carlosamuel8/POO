@@ -34,7 +34,7 @@
 
 
 |[Cinema](https://github.com/carlosamuel8/POO/tree/master/CINEMA) |
-| -- |    
+| -- | 
 
 
 |[Contato](https://github.com/carlosamuel8/POO/tree/master/CONTATO) |
@@ -62,4 +62,8 @@
 
 
 |[Twitter](https://github.com/carlosamuel8/POO/tree/master/TWITTER) |
+<<<<<<< HEAD
 | -- | 
+=======
+| -- | 
+>>>>>>> 82f39baca264720ec4dcaf8bddb19ae7624fe7a8

@@ -53,7 +53,8 @@ public:
 
     Contact( std::string prefix, std::vector<Fone> fones) : prefix(prefix), fones(fones){
     }
-
+    Contact(){}
+    
     void addFone(Fone fone) {
             if( !fone.validate() ) {
                 std::cout << "Fone invalido" << std::endl;
@@ -88,21 +89,31 @@ public:
         return this->name;
     }
 
-    void setName(){
+    void setName(std::string name){
         this->name = name;
     }
+/*
+    std::string toString(){
+        std::stringstream ss;
 
+        ss<<prefix;
+        ss<<name;
+
+        for(auto i : fones){
+           std::cout << i.toString();
+        }
+    }*/
 
 };
 
 class Agenda{
     std::vector<Contact> contacts;
-
+public:
     void addContact(Contact contato){
         contacts.push_back(contato);
     }
 
-    Contact getContato(std::string nome){
+    Contact getContact(std::string nome){
         for(auto x: contacts){
             if(x.getName() == nome )
                 return x;
@@ -149,9 +160,90 @@ class Agenda{
 
 };
 
-int main(){
-    // teste vc mesmo
 
+void controle(Agenda& agenda){
+    std::string linha{""};
+
+    while(true){
+        std::cout << "$";
+
+        getline(std::cin, linha);
+
+        std::stringstream ss(linha);
+        std::string comando;
+
+        ss >> comando;
+
+        if(comando == "init"){
+           agenda = Agenda();
+        }
+
+        else if(comando == "show"){
+            std::cout << agenda.toString();
+        }
+
+        else if(comando == "add"){
+           std::string name;
+
+            ss >> name;
+            Contact contact;
+            contact.setName(name);
+            agenda.addContact(contact);
+        }
+
+        else if(comando == "rm"){
+           std::string name;
+
+           ss >> name;
+
+           agenda.rmContact(name);
+        }
+
+        else if(comando == "rmFone"){
+            std::string name;
+            int id;
+
+            ss >> name >> id;
+            agenda.getContact(name).rmFone(id);
+
+            if(agenda.getContact(name).getFones().size() == 0){
+                agenda.rmContact(name);
+            }
+        }
+
+        else if(comando == "end"){
+            break;
+        }
+
+        else if(comando == "search"){
+            std::string pesquisa;
+
+            ss >> pesquisa;
+
+            std::vector<Contact> result = agenda.search(pesquisa);
+
+            if((int) result.size() == 0){
+                std::cout << "nao encontrou\n";
+
+            }else{
+                for(auto contact : result){
+                    std::cout << contact.toString() << "\n";
+                }
+            }
+
+        }
+        
+        else{
+            std::cout << "Comando invalido\n";
+        }
+    }
+}
+
+
+int main(){
+    Agenda agenda;
+
+    controle(agenda);
 
 
     return 0;

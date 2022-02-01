@@ -64,7 +64,8 @@ class Client {
     std::vector<std::shared_ptr<Account>> accounts;
     std::string clientid;
 public:
-    Client(std::string clientid): clientid{clientid} {}
+    Client(){}
+    Client(std::string clientid) : clientid{clientid} {}
 
     void addAcount(std::shared_ptr<Account> conta){
         accounts.push_back(conta);
@@ -104,7 +105,7 @@ class SavingsAccount : public Account {
     std:: string clienteID;
     int id;
     std:: string type; 
-
+public:
     SavingsAccount(int id, std::string clientId) : Account(id, clientId) {
         this->type = "Poupanca";
     }
@@ -131,14 +132,14 @@ class BankAgency{
     std::map<int, std::shared_ptr<Account>> contas;
     std::map<std::string, std::shared_ptr<Client>> clientes;
     int nextAccountId;
-
+    public:
     std::shared_ptr<Account>  getAccount(int id){
         return contas[id];
 
     }
 
     void addClient(std::string client){
-        this->clientes[client] = std::make_shared<Client> (new Client(client));
+        this->clientes[client] = std::make_shared<Client> ( Client(client));
     }
 
     void deposit(int idConta, float valor){
@@ -151,7 +152,7 @@ class BankAgency{
         }
     } 
 
-    void transferer(int contaDe, int contaPara, float valor){
+    void transferir(int contaDe, int contaPara, float valor){
         getAccount(contaDe)->withdraw(valor);
         getAccount(contaPara)->deposit(valor); 
     }
@@ -161,12 +162,12 @@ class BankAgency{
 
     std::string toString(){
         std::stringstream temp;
-        temp<<"CONTAS";
+        temp<<"CONTAS ";
         for(auto [x, y]: contas){
             temp<<y->toString();
         }
 
-        temp<<"CLIENTES";
+        temp<<"CLIENTES ";
         for(auto [x, y]: clientes){
             temp<<y->toString();
         }
@@ -176,4 +177,71 @@ class BankAgency{
 
 int main(){
 
+    BankAgency bank;
+
+    while(true){
+        std::string linha{""};
+        std::cout << "$";
+
+        getline(std::cin, linha);
+
+        std::stringstream ss(linha);
+        std::string comando;
+        ss >> comando;
+
+        if(comando == "addCliente"){
+            std::string clientId;
+            ss >> clientId;
+            bank.addClient(clientId);
+        }
+        
+        else if(comando == "rmmCliente"){
+            std::string clientId;
+            ss >> clientId;
+        }
+
+        else if(comando == "depositar"){
+            int id = -1;
+            float value = 0;
+
+            ss >> id >> value;
+
+            bank.deposit(id, value);
+        }
+
+        else if(comando == "sacar"){
+            int id = -1;
+            float value = 0;
+
+            ss >> id >> value;
+
+            bank.withdraw(id, value);
+        }
+
+        else if(comando == "transferir"){
+            int idP= -1;
+            int idD = -1;
+            float value = 0;
+            ss >> idD >> idP >> value;
+            bank.transferir(idD, idP, value);
+        }
+
+        else if(comando == "show"){
+            std::cout << bank.toString();
+        }     
+
+        else if(comando == "update"){
+            bank.monthlyUpdate();
+        }
+
+        else if(comando == "end"){
+            break;
+        }
+
+        else{
+            std::cout << "comando invalido\n";
+        } 
+    }
 }
+
+   
