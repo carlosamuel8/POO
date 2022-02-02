@@ -177,7 +177,7 @@ class BankAgency{
 
 int main(){
 
-    BankAgency bank;
+    BankAgency banco;
 
     while(true){
         std::string linha{""};
@@ -192,7 +192,7 @@ int main(){
         if(comando == "addCliente"){
             std::string clientId;
             ss >> clientId;
-            bank.addClient(clientId);
+            banco.addClient(clientId);
         }
         
         else if(comando == "rmmCliente"){
@@ -206,7 +206,7 @@ int main(){
 
             ss >> id >> value;
 
-            bank.deposit(id, value);
+            banco.deposit(id, value);
         }
 
         else if(comando == "sacar"){
@@ -215,7 +215,7 @@ int main(){
 
             ss >> id >> value;
 
-            bank.withdraw(id, value);
+            banco.withdraw(id, value);
         }
 
         else if(comando == "transferir"){
@@ -223,15 +223,15 @@ int main(){
             int idD = -1;
             float value = 0;
             ss >> idD >> idP >> value;
-            bank.transferir(idD, idP, value);
+            banco.transferir(idD, idP, value);
         }
 
         else if(comando == "show"){
-            std::cout << bank.toString();
+            std::cout << banco.toString();
         }     
 
         else if(comando == "update"){
-            bank.monthlyUpdate();
+            banco.monthlyUpdate();
         }
 
         else if(comando == "end"){
