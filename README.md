@@ -1,4 +1,4 @@
-# POO
+# Atividades de POO (Programação Orientada a Objetos)
 
 | [Atividade 1](https://github.com/carlosamuel8/POO/tree/master/ATIVIDADE%201) |
 | -- | 
