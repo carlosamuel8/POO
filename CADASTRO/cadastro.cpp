@@ -3,6 +3,7 @@
 #include<sstream>
 #include<memory>
 #include<map>
+#include <iomanip>
 
 class Account{
 protected:
@@ -13,16 +14,16 @@ protected:
 
 public:
     Account(int id, std:: string clienteID ) : clienteID{clienteID}, id{id} {}
+   
+    virtual void monthlyUpdate(){
+        throw std::runtime_error("erro de implementacao");
+    }
 
     void deposit(float valor){
         balance+=valor;
     }
 
-    void monthlyUpdate(){
-        throw "erro de implementacao";
-    }
-
-    void transfer(std::shared_ptr<Account> conta, float valor){
+    void transfer(Account* conta, float valor){
         withdraw(valor);
         conta->deposit(valor);
     }
@@ -31,15 +32,9 @@ public:
         balance-=valor;
     }
 
-    std::string toString(){
-        std::stringstream temp;
-        temp<<"=~=~=~=~=~=~=~=~=~=~=~=~==~=";
-        temp<<"Nome: "<<clienteID;
-        temp<<"ID " <<id;
-        temp<<"Tipo de conta: " << type;
-        temp<<"Saldo: " <<balance;
-        temp<<"=~=~=~=~=~=~=~=~=~=~=~=~==~=";
-        return temp.str();
+    friend std::ostream &operator<<(std::ostream& os, Account& account){
+        os << account.getId() << ":" << account.getClientid() << ":" << std::setprecision(2) << std::fixed << account.getBalance() << ":" << account.getType();
+        return os;
     }
 
     float getBalance(){
@@ -57,32 +52,30 @@ public:
     std::string getType(){
         return type;
     }
+
 };
 
 
 class Client {
-    std::vector<std::shared_ptr<Account>> accounts;
+    std::vector<Account*> accounts;
     std::string clientid;
 public:
     Client(){}
     Client(std::string clientid) : clientid{clientid} {}
 
-    void addAcount(std::shared_ptr<Account> conta){
+    void addAcount(Account* conta){
         accounts.push_back(conta);
     }
-
-    std::string toString(){
-        std::stringstream temp;
-
-        temp<<clientid;
-
-        for(auto x: accounts){
-            temp<<x->toString();
+    
+    friend std::ostream &operator<<(std::ostream& os, const Client& client) {
+        for(auto& account : client.accounts){
+            os << *account << "\n";
         }
-        return temp.str();
+
+        return os;
     }
 
-    std::vector<std::shared_ptr<Account>> getAccounts() {
+    std::vector<Account*> getAccounts() {
         return accounts;
     }
 
@@ -90,7 +83,7 @@ public:
         return clientid;
     }
     
-    void setAccounts(std::vector<std::shared_ptr<Account>> contas){
+    void setAccounts(std::vector<Account*> contas){
         accounts=contas;
     }
 
@@ -101,147 +94,213 @@ public:
 
 
 class SavingsAccount : public Account {
-    float balance;
-    std:: string clienteID;
-    int id;
-    std:: string type; 
 public:
+
     SavingsAccount(int id, std::string clientId) : Account(id, clientId) {
         this->type = "Poupanca";
     }
 
     void monthlyUpdate() {
         this->balance += 0.01 * this->balance;
-        std::cout << "Atualizacao mensal da conta poupanca foi realizada.";
+        //std::cout << "Atualizacao mensal da conta poupanca foi realizada.";
     }
 };
 
 
 class CheckingAccount : public Account {
+public:
     CheckingAccount(int id, std::string clientId) : Account(id, clientId) {
         this->type = "Corrente";
     }
 
     void monthlyUpdate() {
         this->balance -= 20;
-        std::cout << "Atualizacao mensal da conta corrente foi realizada.";
+       // std::cout << "Atualizacao mensal da conta corrente foi realizada.";
     }   
 };
 
 class BankAgency{
-    std::map<int, std::shared_ptr<Account>> contas;
+    std::map<int, Account*> contas;
     std::map<std::string, std::shared_ptr<Client>> clientes;
-    int nextAccountId;
-    public:
-    std::shared_ptr<Account>  getAccount(int id){
-        return contas[id];
+    int nextAccountId=0;
 
+    Account*  getAccount(int id){
+        return contas[id];
     }
 
+public:
+
     void addClient(std::string client){
+
         this->clientes[client] = std::make_shared<Client> ( Client(client));
+    
+        this->contas[this->nextAccountId] = new CheckingAccount(this->nextAccountId, client );
+
+        this->clientes[client]->addAcount(this->contas[this->nextAccountId]); 
+        this->nextAccountId++;//mudar o id
+
+        this->contas[this->nextAccountId] = new SavingsAccount(this->nextAccountId, client);
+    
+        this->clientes[client]->addAcount(this->contas[this->nextAccountId]); 
+        this->nextAccountId++;
+        //std::cout << "aqui " <<this->nextAccountId;
     }
 
     void deposit(int idConta, float valor){
-        getAccount(idConta)->deposit(valor);
+        if(idConta<0 || idConta >= this->nextAccountId){
+            throw std::runtime_error("conta nao existe");
+        }
+        else{
+            getAccount(idConta)->deposit(valor);
+        }
     }
 
     void monthlyUpdate(){
         for(auto [x, y]: contas){
             y->monthlyUpdate();
         }
+
     } 
 
     void transferir(int contaDe, int contaPara, float valor){
-        getAccount(contaDe)->withdraw(valor);
-        getAccount(contaPara)->deposit(valor); 
+        if( contaDe >= this->nextAccountId || contaPara >= this->nextAccountId 
+            || contaDe < 0 || contaPara < 0 ){
+            
+            throw std::runtime_error("conta nao existe");
+        }
+
+        else if(this->contas[contaDe]->getBalance() - valor < 0 
+                && this->contas[contaDe]->getType() == "CP"){
+            throw std::runtime_error("saldo insuficiente");
+        }
+        else{
+            getAccount(contaDe)->transfer(getAccount(contaPara), valor);
+        }
     }
+
     void withdraw(int idConta, float valor){
-        getAccount(idConta)->withdraw(valor);
+        if(idConta<0 || idConta >= this->nextAccountId){
+            throw std::runtime_error("conta nao existe");
+        }
+
+        else if(this->contas[idConta]->getBalance() - valor<0 ){
+            throw std::runtime_error("saldo insuficiente");
+        }
+        else{
+            getAccount(idConta)->withdraw(valor);
+        }
     }
 
-    std::string toString(){
-        std::stringstream temp;
-        temp<<"CONTAS ";
-        for(auto [x, y]: contas){
-            temp<<y->toString();
-        }
+    friend std::ostream &operator<<(std::ostream& os, const BankAgency& bank){
+        os << "Clients:\n";
 
-        temp<<"CLIENTES ";
-        for(auto [x, y]: clientes){
-            temp<<y->toString();
+        for(auto& client : bank.clientes){
+            os << "- " << client.first << "[";
+            int contador = 1;
+            for(auto& i : client.second.get()->getAccounts()){
+                if(contador < (int) client.second.get()->getAccounts().size()){
+                    os << i->getId() << ", ";
+                    contador++;
+                }
+                else{
+                    os << i->getId();
+                }
+            }
+            os << "]\n";
         }
-        return temp.str();
+            os <<"Accounts:\n";
+
+            for(auto& account : bank.contas){
+                os <<  *account.second << "\n";
+            }
+        
+
     }
 };
 
-int main(){
 
-    BankAgency banco;
+int main(){
+    BankAgency bank;
 
     while(true){
         std::string linha{""};
-        std::cout << "$";
-
         getline(std::cin, linha);
 
         std::stringstream ss(linha);
         std::string comando;
+
         ss >> comando;
 
-        if(comando == "addCliente"){
-            std::string clientId;
-            ss >> clientId;
-            banco.addClient(clientId);
+        try{
+            if(comando == "addCli"){
+                std::string clientId;
+
+                ss >> clientId;
+
+                bank.addClient(clientId);
+            }              
+            else if(comando == "show"){
+                std::cout << bank;
+            }          
+            else if(comando == "saque"){
+                int id = -1;
+                float value = 0;
+                ss >> id >> value;
+
+                bank.withdraw(id, value);
+            }
+            else if(comando == "deposito"){
+                int id = -1;
+                float value = 0;
+                ss >> id >> value;
+
+                bank.deposit(id, value);
+            }
+            else if(comando == "transf"){
+                int idPara = -1;
+                int idDe = -1;
+                float valor = 0;
+                ss >> idDe;
+                ss>> idPara;
+                ss >> valor;
+
+                bank.transferir(idDe, idPara, valor);
+            }
+            else if(comando == "update"){
+                bank.monthlyUpdate();
+            }
+            else if(comando == "end"){
+                break;
+            }
+            else{
+                std::cout << "Comando invalido\n";
+            } 
         }
-        
-        else if(comando == "rmmCliente"){
-            std::string clientId;
-            ss >> clientId;
+        catch(const std::exception& erro){
+            std::cout << erro.what() << '\n';
         }
-
-        else if(comando == "depositar"){
-            int id = -1;
-            float value = 0;
-
-            ss >> id >> value;
-
-            banco.deposit(id, value);
-        }
-
-        else if(comando == "sacar"){
-            int id = -1;
-            float value = 0;
-
-            ss >> id >> value;
-
-            banco.withdraw(id, value);
-        }
-
-        else if(comando == "transferir"){
-            int idP= -1;
-            int idD = -1;
-            float value = 0;
-            ss >> idD >> idP >> value;
-            banco.transferir(idD, idP, value);
-        }
-
-        else if(comando == "show"){
-            std::cout << banco.toString();
-        }     
-
-        else if(comando == "update"){
-            banco.monthlyUpdate();
-        }
-
-        else if(comando == "end"){
-            break;
-        }
-
-        else{
-            std::cout << "comando invalido\n";
-        } 
     }
+
+    return 0;
 }
 
-   
+/*
+addCli Almir
+addCli Julia
+addCli Maria
+
+deposito 0 100
+deposito 1 200
+deposito 2 50
+deposito 3 300
+saque 3 50
+saque 0 70
+saque 1 300
+
+transf 3 5 200
+transf 0 4 25
+transf 9 1 30
+
+update
+
+*/

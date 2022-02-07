@@ -2,6 +2,9 @@
 #include<map>
 #include<vector>
 #include<sstream>
+#include <stdexcept>
+
+
 
 class IMedico;
 class Medico;
@@ -13,7 +16,8 @@ class IPaciente {
         virtual std::string getId() = 0;
         virtual std::map<std::string, IMedico*> getMedicos() = 0;
         virtual void removerMedico(std::string idMedico) = 0;
-        //virtual std::string to_String();
+        virtual std::string toString() = 0;
+
 };
 
 class IMedico{
@@ -23,18 +27,24 @@ class IMedico{
         virtual std::string getId() = 0;
         virtual std::map<std::string, IPaciente*> getPacientes() = 0;
         virtual void removerPaciente(std::string idmedico) = 0;
+        virtual std::string toString() = 0;
 };
 
 
 class Paciente : public IPaciente{
+    std::string id;
     std::string diagnostico;
     std::map<std::string, IMedico*> medicos;
-    std::string id;
 public:
     Paciente(std::string id, std::string diagnostico) : id{id}, diagnostico{diagnostico}{}
 
     void addMedico(IMedico *medico){
-        medicos[medico->getId()] = medico;
+        if(medicos.find(medico->getId()) == medicos.end() ){
+            medicos[medico->getId()] = medico;
+        }
+        else{
+            throw std::runtime_error("medico ja esta cadastrado");
+        }
     }
 
     std::string getDiagnostico(){
@@ -50,19 +60,22 @@ public:
     }   
 
     void removerMedico(std::string medicoId){
-        medicos.erase(medicoId);
+        if(medicos.find(medicoId) != medicos.end() )
+            medicos.erase(medicoId);
+        else{
+            throw std::runtime_error("medico nao existe");
+        }
     }
 
     std::string toString(){
         std::stringstream ss;
 
-        ss<<diagnostico;
-        ss<<id;
-
+        ss << "Pac: " <<  this->getId() << ":" << this->getDiagnostico() <<"  Meds[";
+        
         for(auto x : medicos){
-            ss<<x.second->getId();
+            ss<<x.second->getId()<< ", ";
         }
-
+        ss << "]";
         return ss.str();
     }  
     
@@ -70,14 +83,18 @@ public:
 
 
 class Medico : public IMedico{
+    std::string id;
     std::string classe;
     std::map<std::string, IPaciente*> pacientes;
-    std::string id;
 public:
     Medico(std::string id, std::string classe) : id{id}, classe{classe}{}
 
     void addPaciente(IPaciente *paciente){
-        pacientes[paciente->getId()] = paciente;
+        if(pacientes.find(paciente->getId()) == pacientes.end() )
+            pacientes[paciente->getId()] = paciente;
+        else{
+            throw std::runtime_error("paciente ja existe");
+        }
     }
 
     std::string getClasse(){
@@ -93,19 +110,22 @@ public:
     } 
 
     void removerPaciente(std::string idPaciente){
-        pacientes.erase(idPaciente);
+        if(pacientes.find(idPaciente) == pacientes.end() )
+            pacientes.erase(idPaciente);
+        else{
+            throw std::runtime_error("paciente nao existe");
+        }
     }
 
     std::string toString(){
         std::stringstream ss;
 
-        ss<<classe;
-        ss<<id;
-
+        ss << "Med: " << this->getId() << ":" << this->getClasse()<< "  Pacs[";
+        
         for(auto x : pacientes){
-            ss<<x.second->getId();
+            ss<<x.second->getId() << ", ";
         }
-
+        ss << "]";
         return ss.str();
     }  
 };
@@ -119,33 +139,71 @@ public:
     Hospital(){}
 
     void addMedico(IMedico *medico){
-        medicos[medico->getId()] = medico;
+        if(medicos.find(medico->getId()) == medicos.end())
+            medicos[medico->getId()] = medico;
+        else{
+            throw std::runtime_error("medico ja esta cadastrado");
+        }
     }
 
     void addPaciente(IPaciente *paciente){
-        pacientes[paciente->getId()] = paciente;
+        if(pacientes.find(paciente->getId()) == pacientes.end() )
+            pacientes[paciente->getId()] = paciente;
+        else{
+            throw std::runtime_error("paciennte ja esta cadastrado");
+        }  
     }
 
     void removerMedico(std:: string medicoId){
-        medicos.erase(medicoId);
+        if(medicos.find(medicoId) != medicos.end() )
+            medicos.erase(medicoId);
+        else{
+            throw std::runtime_error("medico nao existe");
+        }
     }
 
     void removerPaciente(std:: string pacienteId){
-        pacientes.erase(pacienteId);
+        if(pacientes.find(pacienteId) != pacientes.end() )
+            pacientes.erase(pacienteId);
+        else{
+            throw std::runtime_error("paciente nao existe");
+        }
     }
 
-    void showAll(){
-        std::cout<< "PACIENTES: ";
+    std::string showAll(){
+        std::stringstream ss;
+
         for(auto x : pacientes){
-            std::cout<< x.second->getId() << " ";
+           ss << x.second->toString() << "\n";
         }
-        std::cout<< "\nMEDICOS: ";
+
         for(auto x : medicos){
-            std::cout<< x.second->getId() << " ";
+          ss << x.second->toString() << "\n";
         }
+
+        return ss.str();
     }
 
     void vincular(std::string medico, std::string paciente){
+        //verificar se existem
+        if(medicos.find(medico) == medicos.end() ){
+            throw std::runtime_error("medico nao existe");
+        }
+
+        if(pacientes.find(paciente) == pacientes.end() ){
+            throw std::runtime_error("paciente nao existe");
+        }
+
+        for(auto i : pacientes[paciente]->getMedicos()){
+            if(i.second->getId() == medico){
+                throw std::runtime_error("medico ja existe") ;
+            }
+            if(i.second->getClasse() == medicos[medico]->getClasse() ){
+                throw std::runtime_error("medico de especialidade ja existente");
+            }
+
+        }
+        //adicionar
         medicos[medico]->addPaciente(pacientes[paciente]); 
         pacientes[paciente]->addMedico(medicos[medico]); 
     }
@@ -157,17 +215,96 @@ public:
 int main() {
     Hospital hospital;
 
-    hospital.addPaciente(new Paciente("Fagner", "Preguiça"));
-    hospital.addPaciente(new Paciente("Carlos", "Obesidade"));
-    hospital.addPaciente(new Paciente("Yasmin", "covid"));
+    std::string linha{""};
+    std::string comando{""};
 
-    hospital.addMedico(new Medico("Samuel", "Obstetra"));
-    hospital.addMedico(new Medico("Augusto", "Pediatra"));
-    hospital.addMedico(new Medico("Eliza", "clinica geral"));
+    while (true){
+        
+        getline(std::cin, linha);
+        std::stringstream ss(linha);
+        ss >> comando;
 
-    hospital.vincular("Samuel", "Fagner");
-    hospital.vincular("Eliza", "Yasmin");
+        try{
+            if(comando == "addPacs"){
+            std::string temp;
 
-    hospital.showAll();
+            while(ss >> temp){
+               int separador = temp.find("-");
+
+               std::string paciente = temp.substr(0, separador);
+               std::string diagnostico = temp.substr(separador + 1);
+
+               hospital.addPaciente(new Paciente(paciente, diagnostico));
+            }
+
+            }
+            
+            else if(comando == "addMeds"){
+                std::string temp;
+
+                while(ss >> temp){
+                int pos = temp.find("-");
+
+                std::string id = temp.substr(0, pos);
+                std::string classe = temp.substr(pos + 1);
+
+                hospital.addMedico(new Medico(id, classe));
+                }
+            }
+            
+            else if(comando == "rmPac"){
+                std::string pacId;
+
+                ss >> pacId;
+
+                hospital.removerPaciente(pacId);
+            }
+            
+            else if(comando == "rmMed"){
+                std::string medId;
+
+                ss >> medId;
+
+                hospital.removerMedico(medId);
+            }
+            
+            else if(comando == "show"){
+                std::cout << hospital.showAll();
+            }
+
+            else if(comando == "tie"){
+                std::string medId;
+                std::string pacId;
+
+                ss >> medId;
+
+                while(ss >> pacId){
+                    hospital.vincular(medId, pacId);
+                }
+            }
+
+            else if(comando == "end"){
+                break;
+            }
+
+            else{
+                throw std::runtime_error("comando invalido");
+            }
+ 
+        }
+        catch(std::runtime_error erro){
+            std::cout<<erro.what() <<"\n";
+        }
+    }
+
 }
 
+
+/*
+addPacs fred-fratura alvis-avc goku-hemorragia silva-sinusite
+addMeds joao-cirurgia maria-alergologia cesar-cirurgia
+show
+
+rmMed joao
+show
+*/
