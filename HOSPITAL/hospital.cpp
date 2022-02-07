@@ -70,7 +70,7 @@ public:
     std::string toString(){
         std::stringstream ss;
 
-        ss << "Pac: " <<  this->getId() << ":" << this->getDiagnostico() <<"  Meds[";
+        ss << "Pac: " <<  this->getId() << ":" << this->getDiagnostico() <<"     Meds[";
         
         for(auto x : medicos){
             ss<<x.second->getId()<< ", ";
@@ -120,7 +120,7 @@ public:
     std::string toString(){
         std::stringstream ss;
 
-        ss << "Med: " << this->getId() << ":" << this->getClasse()<< "  Pacs[";
+        ss << "Med: " << this->getId() << ":" << this->getClasse()<< "     Pacs[";
         
         for(auto x : pacientes){
             ss<<x.second->getId() << ", ";
@@ -292,8 +292,8 @@ int main() {
             }
  
         }
-        catch(std::runtime_error erro){
-            std::cout<<erro.what() <<"\n";
+        catch(const std::exception& erro){
+            std::cout << erro.what() << '\n';
         }
     }
 
@@ -302,9 +302,13 @@ int main() {
 
 /*
 addPacs fred-fratura alvis-avc goku-hemorragia silva-sinusite
-addMeds joao-cirurgia maria-alergologia cesar-cirurgia
+addMeds bisturi-cirurgia snif-alergologia facada-cirurgia
+
 show
 
-rmMed joao
+tie bisturi fred alvis goku
+tie snif silva alvis
+tie facada goku
+
 show
 */
