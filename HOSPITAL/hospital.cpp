@@ -39,12 +39,7 @@ public:
     Paciente(std::string id, std::string diagnostico) : id{id}, diagnostico{diagnostico}{}
 
     void addMedico(IMedico *medico){
-        if(medicos.find(medico->getId()) == medicos.end() ){
-            medicos[medico->getId()] = medico;
-        }
-        else{
-            throw std::runtime_error("medico ja esta cadastrado");
-        }
+        medicos[medico->getId()] = medico;
     }
 
     std::string getDiagnostico(){
@@ -60,11 +55,7 @@ public:
     }   
 
     void removerMedico(std::string medicoId){
-        if(medicos.find(medicoId) != medicos.end() )
-            medicos.erase(medicoId);
-        else{
-            throw std::runtime_error("medico nao existe");
-        }
+        medicos.erase(medicoId);
     }
 
     std::string toString(){
@@ -110,11 +101,7 @@ public:
     } 
 
     void removerPaciente(std::string idPaciente){
-        if(pacientes.find(idPaciente) == pacientes.end() )
-            pacientes.erase(idPaciente);
-        else{
-            throw std::runtime_error("paciente nao existe");
-        }
+        pacientes.erase(idPaciente);
     }
 
     std::string toString(){
@@ -203,7 +190,7 @@ public:
             }
 
         }
-        //adicionar
+        //vincular
         medicos[medico]->addPaciente(pacientes[paciente]); 
         pacientes[paciente]->addMedico(medicos[medico]); 
     }
