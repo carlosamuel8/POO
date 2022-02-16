@@ -150,7 +150,7 @@ public:
             }
         }
 
-        if(auxiliar.size()<0){
+        if(auxiliar.size()<=0){
             throw std::runtime_error("sem resultado de busca");
         }
 
@@ -239,7 +239,7 @@ int main(){
                 break;
             }
             else {
-                std::runtime_error("comando invalido");
+                throw std::runtime_error("comando invalido");
             }
         }
 
