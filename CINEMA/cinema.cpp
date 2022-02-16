@@ -25,7 +25,6 @@ public:
         this->id_nome = id_nome;
     } 
 
-
 };
 
 
