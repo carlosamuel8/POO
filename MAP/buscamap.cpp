@@ -150,6 +150,10 @@ public:
             }
         }
 
+        if(auxiliar.size()<0){
+            throw std::runtime_error("sem resultado de busca");
+        }
+
         return auxiliar;
     }
 
@@ -248,12 +252,22 @@ int main(){
 
 /*
 
-$add eva oio:8585 cla:9999
-$add ana tim:3434 
-$add bia viv:5454
-$add ana cas:4567 oio:8754
+add eva oio:8585 cla:9999
+add ana tim:3434 
+add bia viv:5454
 
+add ana cas:4567 oio:8754
 
+show
+
+rmFone ana 0
+
+show
+add ava tim:5454
+
+rmContact bia
+
+search va
 
 
 */
