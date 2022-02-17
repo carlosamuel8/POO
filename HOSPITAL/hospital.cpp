@@ -81,11 +81,7 @@ public:
     Medico(std::string id, std::string classe) : id{id}, classe{classe}{}
 
     void addPaciente(IPaciente *paciente){
-        if(pacientes.find(paciente->getId()) == pacientes.end() )
-            pacientes[paciente->getId()] = paciente;
-        else{
-            throw std::runtime_error("paciente ja existe");
-        }
+        pacientes[paciente->getId()] = paciente;
     }
 
     std::string getClasse(){
